@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../layout/head')%>
+    <title>Book</title>
+  </head>
+
+  <body>
+    <header><%- include('../layout/header.ejs')%></header>
+    <h2 class="counter">You have: <span> <%= counter %> </span> books saved</h2>
+    <main class="container">
+
+          <% bookInfo.forEach(item=>{ %>
+          <section class="result">
+            <img src="<%= item.image_url %>" />
+            <h2><%= item.title %></h2>
+            <h4><%= item.author %></h4>
+            <button class="submit"><a href="/books/<%= item.id %>">View Details</a></button>
+          </section>
+          <% }); %>
+
+    </main>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="js/app.js"></script>
+  </body>
+</html>
