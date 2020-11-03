@@ -6,20 +6,23 @@ const
   pg = require('pg'),
   app = express(),
   PORT = process.env.PORT || 3000,
-  client = new pg.Client(process.env.DATABASE_URL);
+  client = new pg.Client(process.env.DATABASE_URL),
+  methodOverride = require('method-override');//new
+
 
 // -------------------------------
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
-app.use(express.urlencoded({
-  extended: true
-}));
+app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));//new
 // -------------------------------
 app.get('/', getFromDatabase)
 app.get('/search/new', getFormSearch)
 app.post('/searches', getNewBooks)
 app.get('/books/:id', showMoreDetails)
 app.post('/books', addToDatabase)
+app.put('/books/:id', uppdateBook)//new for update
+app.delete('/books/:id',deletData)//new for delete
 app.get('*', getError)
 // -------------------------------
 // functions for endPoint
@@ -89,6 +92,31 @@ function addToDatabase(req, res) {
       Details: dataGet.rows[lastItem]
     });
   })
+}
+
+function uppdateBook(req,res){
+//   const bookId = req.params.id;
+//   const {author,title,ISBN,image_url,description,bookshelf}=req.body;
+//   const sql = 'UPDATE book SET author=$1,title=$2,ISBN=$3,image_url=$4,description=$5,bookshelf=$6 WHERE id=$6;';
+//   const safeValues = [author,title,ISBN,image_url,description,bookshelf,bookId];
+//   client.query(sql,safeValues).then(()=>{
+//     res.redirect(`/`);
+//   })
+  const id = req.params.id
+  let { bookname, bookauthor,bookdesc, bookISBN, bookcat,image_url} = req.body;
+  let sql = `UPDATE book SET title=$1,author=$2,description=$3,ISBN=$4,bookshelf=$5,image_url=$6 WHERE ID =$7;`;
+  let safeValues = [bookname, bookauthor, bookdesc, bookISBN , bookcat,image_url , id];
+  client.query(sql, safeValues).then(() => {
+    res.redirect('/');
+  })
+
+}
+function deletData(req, res){
+  const taskId = req.params.id;
+  const sql = 'DELETE FROM book WHERE id=$1';
+  client.query(sql, [taskId]).then(()=>{
+    res.redirect('/');
+  });
 }
 
 function getError(req, res) {
